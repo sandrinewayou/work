@@ -40,7 +40,7 @@ end
 
 #------
 
-include("../MainFunctions.jl")
+include("MainFunctions.jl")
 import .Gillespie
 
 using Plots
