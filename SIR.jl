@@ -55,7 +55,7 @@ t = 0:1000
 
 hist = zeros(Int,(length(t),3))
 
-result = Gillespie.run_gillespie!(
+Gillespie.run_gillespie!(
         t,x0,par,
         execute!,rates!,
         Vector{Float64}(undef,2),hist
