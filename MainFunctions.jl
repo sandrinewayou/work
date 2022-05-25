@@ -75,8 +75,7 @@ function mainiteration!(pop_hist,rates,n0,ct,time,par,ex!::F1,r!::F2,hstart) whe
 end
 
 historylength(population_history::Vector,par) = length(population_history)
-historylength(population_history::Matrix,par) = length(view(population_history,1,:))
-
+historylength(population_history::Matrix,par) = length(view(population_history,:,1))
 historylength(population_history::Dict,par) = par.historylength
 
 function dropzeros!(ps::Dict{<:Any,<:Number})
