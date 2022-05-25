@@ -46,7 +46,7 @@ import .Gillespie
 using Plots
 
 par = (
-    β = 5/1000000,
+    β = 5/100000,
     γ = 0.005
     )
 
