@@ -23,7 +23,7 @@ function recovery!(x)
     nothing
 end
 
-function execute!(x)
+function execute!(i,x,par)
     if i == 1
         vaccination!(x)
     elseif i == 2
@@ -74,7 +74,7 @@ hist = zeros(Int,(length(t),5))
 Gillespie.run_gillespie!(
         t,x0,par,
         execute!,rates!,
-        Vector{Float64}(undef,2),hist
+        Vector{Float64}(undef,4),hist
         )
 
 
