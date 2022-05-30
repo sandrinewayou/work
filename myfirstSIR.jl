@@ -29,9 +29,9 @@ function execute!(i,x,par)
     elseif i == 2
         immunity!(x)
     elseif i == 3
-            infection!(x)
+        infection!(x)
     elseif i == 4
-            recovery!(x)
+        recovery!(x)
     else
         error("Unknown event number i = $i")
     end
@@ -42,7 +42,7 @@ function rates!(rates,x,par)
     #rate of vaccination
     rates[1] = par.a * x[1]
     #rate of immunity
-    rates[1] = par.b * x[2]
+    rates[2] = par.b * x[2]
     #rate of infection
     rates[3] = par.β * x[3] * x[4]
     #rate of recovery
@@ -77,5 +77,6 @@ Gillespie.run_gillespie!(
         Vector{Float64}(undef,4),hist
         )
 
-
+        #plot simulation
+        plot(hist,label=["S" "V" "PI" "I" "R"])
 #i just try something here
