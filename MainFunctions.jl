@@ -127,8 +127,9 @@ end
 Executes one step of the evolution by modifying `x_0` and `rates`.
 """
 function onestep!(x_0,rates,t_0,t_end,par,ex!::F1,r!::F2) where {F1,F2}
+    dt = t_0
     while t_0 ≤ t_end
-        r!(rates,x_0,par)
+        r!(rates,x_0,par,dt)
         #choose next event and event time
         i, dt = nexteventandtime(rates)
         #Population in absorbing state
@@ -142,8 +143,9 @@ function onestep!(x_0,rates,t_0,t_end,par,ex!::F1,r!::F2) where {F1,F2}
 end
 
 function onestep!(x_0,rates::Dict,t_0,t_end,par,ex!::F1,r!::F2) where {F1,F2}
+    dt = t_0
     while t_0 ≤ t_end
-        r!(rates,x_0,par)
+        r!(rates,x_0,par,dt)
         #choose next event and event time
         i, trait, dt = nexteventandtime(rates)
         #Population in absorbing state
@@ -157,8 +159,9 @@ function onestep!(x_0,rates::Dict,t_0,t_end,par,ex!::F1,r!::F2) where {F1,F2}
 end
 
 function onestep!(x_0::Real,rates::Vector,t_0,t_end,par,ex!::F1,r!::F2) where {F1,F2}
+    dt = t_0
     while t_0 ≤ t_end
-        r!(rates,x_0,par)
+        r!(rates,x_0,par,dt)
         #choose next event and event time
         i, dt = nexteventandtime(rates)
         #Population in absorbing state
@@ -172,8 +175,9 @@ function onestep!(x_0::Real,rates::Vector,t_0,t_end,par,ex!::F1,r!::F2) where {F
 end
 
 function onestep!(x_0::Dict,rates::Vector,t_0,t_end,par,ex!::F1,r!::F2) where {F1,F2}
+    dt = t_0
     while t_0 ≤ t_end
-        r!(rates,x_0,par)
+        r!(rates,x_0,par,dt)
         #choose next event and event time
         i, dt = nexteventandtime(rates)
         #Population in absorbing state

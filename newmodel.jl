@@ -46,7 +46,7 @@ function execute!(i,x,par)
     nothing
 end
 
-function rates!(rates,x,par,contact)
+function rates!(rates,x,par,t)
     #rate of vaccination
     rates[1] = par.a * x[1]
     #rate of immunity
@@ -68,13 +68,16 @@ include("MainFunctions.jl")
 import .Gillespie
 
 using Plots
+
 contact = [0.2,0.04,0.1,0.15]
+
 par = (
     a = 1/15,
     b=1/50,
     β = sum(contact),
     γ = 0.005,
-    α = 1/270
+    α = 1/270,
+    contact = contact
     )
 
 x0 = [9999,0,0,1,0]
@@ -82,11 +85,11 @@ t = 0:500
 
 hist = zeros(Int,(length(t),5))
 
-Gillespie.run_gillespie!(
-        t,x0,par,
-        execute!,rates!,
-        Vector{Float64}(undef,4),hist
-        )
-
-        #plot simulation
-        plot(hist,label=["S" "V" "PI" "I" "R"])
+# Gillespie.run_gillespie!(
+#         t,x0,par,
+#         execute!,rates!,
+#         Vector{Float64}(undef,4),hist
+#         )
+#
+# #plot simulation
+# plot(hist,label=["S" "V" "PI" "I" "R"])
