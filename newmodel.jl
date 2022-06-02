@@ -60,6 +60,17 @@ function rates!(rates,x,par,t)
     nothing
 end
 
+function basic_reproduction(t,t_end,a,r_0)
+    return r_0(1+a*cos(2*pi*((t-t_end)/365)))
+end
+
+function contact_rate(t,t_end,a,r_0,infect_period,ind)
+    return (basic_reproduction(t,t_end,a,r_0)/infect_period[1]*ind[1],
+            basic_reproduction(t,t_end,a,r_0)/infect_period[1]*ind[2],
+            basic_reproduction(t,t_end,a,r_0)/infect_period[2]*ind[1],
+            basic_reproduction(t,t_end,a,r_0)/infect_period[2]*ind[2])
+end
+
 
 
 
@@ -69,27 +80,32 @@ import .Gillespie
 
 using Plots
 
-contact = [0.2,0.04,0.1,0.15]
+#contact = [0.2,0.04,0.1,0.15]
+t_end=500
+a=0,5
+r_0=4
+infect_period=[5,10]
+ind=[6666,3333]
 
 par = (
     a = 1/15,
     b=1/50,
-    β = sum(contact),
+    β = sum(contact_rate(t,t_end,a,r_0,infect_period,ind)),
     γ = 0.005,
     α = 1/270,
-    contact = contact
+    #contact = contact
     )
 
-x0 = [9999,0,0,1,0]
+x0 = [sum(ind),0,0,1,0]
 t = 0:500
 
 hist = zeros(Int,(length(t),5))
 
-# Gillespie.run_gillespie!(
-#         t,x0,par,
-#         execute!,rates!,
-#         Vector{Float64}(undef,4),hist
-#         )
-#
-# #plot simulation
-# plot(hist,label=["S" "V" "PI" "I" "R"])
+Gillespie.run_gillespie!(
+        t,x0,par,
+        execute!,rates!,
+        Vector{Float64}(undef,4),hist
+        )
+
+#plot simulation
+plot(hist,label=["S" "V" "PI" "I" "R"])
