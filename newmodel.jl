@@ -95,14 +95,16 @@ par = (
     )
 
 x0 = [sum(ind),0,0,1,0]
-t = 0:500
+t = 0:1500
 
-hist = zeros(Int,(length(t),5))
+# 1 S | 2 V | 3 PI | 4 I | 5 R
+num_types = 5
+hist = zeros(Int,(length(t),num_types))
 
 Gillespie.run_gillespie!(
         t,x0,par,
         execute!,rates!,
-        Vector{Float64}(undef,5),hist
+        Vector{Float64}(undef,num_types),hist
         )
 
 #plot simulation
