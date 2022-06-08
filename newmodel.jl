@@ -47,17 +47,17 @@ function execute!(i,x,par)
 end
 
 function rates!(rates,x,par,t)
-    β = contact_rate(t,par.contact_par...)
+    λ = contact_rate(t,par.contact_par...)
     #rate of vaccination
-    rates[1] = par.a * x[1]
+    rates[1] = par.α * x[1]
     #rate of immunity
-    rates[2] = par.b * x[2]
+    rates[2] = par.β * x[2]
     #rate of infection
-    rates[3] = β * x[3] * x[4]
+    rates[3] = λ * x[3] * x[4]
     #rate of recovery
     rates[4] = par.γ * x[4]
     #rate of suscepbility
-    rates[5] = par.α * x[5]
+    rates[5] = par.δ * x[5]
     nothing
 end
 
@@ -85,11 +85,11 @@ infect_period=[5,10]
 ind=[6666,3333]
 
 par = (
-    a = 1/15,
-    b = 1/50,
+    α = 1/15,
+    β = 1/50,
     #β = contact_rate(0,t_end,a,r_0,infect_period,ind),
     γ = 0.005,
-    α = 1/270,
+    δ = 1/270,
     contact_par = [t_end,a,r_0,infect_period,ind]
     #contact = contact
     )
