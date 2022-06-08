@@ -123,9 +123,6 @@ begin #Setup Parameter
 	)
 end;
 
-# ╔═╡ 354c456f-745d-46df-9060-ae281dd2f002
-sum(ind)
-
 # ╔═╡ 1ac6bfb7-a740-4508-9615-065ba809bb0e
 md"""---
 **Function Library**
@@ -187,7 +184,6 @@ end
 # ╠═eb32b9a4-dfd2-4a24-8a75-e10bf9eceda4
 # ╟─beee6289-5971-452b-9561-a40868f0874a
 # ╠═76c1915b-c6af-4e6d-94e8-59dc4608f8a9
-# ╠═354c456f-745d-46df-9060-ae281dd2f002
 # ╠═a80a9b8c-c738-4f88-aefb-29fcdde1ecf5
 # ╟─1ac6bfb7-a740-4508-9615-065ba809bb0e
 # ╟─8471abab-a994-413c-b272-294ee818ed37
