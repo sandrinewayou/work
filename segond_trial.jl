@@ -9,18 +9,21 @@ function  plus_minus_one(x,plus_index, minus_index)
 end
 
     #events
-vaccination!(x) =  plus_minus_one(x,2, 1)
-infection!(x,1) =  plus_minus_one(x,3, 1)
-infection!(x,2) =  plus_minus_one(x,4, 2)
-death!(x,3)     =  plus_minus_one(x,5, 3)
-death!(x,4)     =  plus_minus_one(x,5, 4)
-recovery!(x,3)  =  plus_minus_one(x,6, 3)
-recovery!(x.4)  =  plus_minus_one(x,6, 4)
+ vaccination!(x) =  plus_minus_one(x,2, 1)
+ infection!(x,j) =  plus_minus_one(x,3, j)
+ #infection!(x,1) =  plus_minus_one(x,3, 1)
+ #infection!(x,2) =  plus_minus_one(x,4, 2)
+ death!(x,j)     =  plus_minus_one(x,5, j)
+#death!(x,3)     =  plus_minus_one(x,5, 3)
+#death!(x,4)     =  plus_minus_one(x,5, 4)
+recovery!(x,j)  =  plus_minus_one(x,6, j)
+#recovery!(x,3)  =  plus_minus_one(x,6, 3)
+#recovery!(x,4)  =  plus_minus_one(x,6, 4)
 immunity!(x)    =  plus_minus_one(x,2, 6)
 inimmunity!(x)  =  plus_minus_one(x,1, 2)
 
 #execution function
-function execute!(i,x,par,)
+function execute!(i,x,par)
     if i == 1
         vaccination!(x)
     elseif i == 2
@@ -60,16 +63,16 @@ end
 function rates!(rates,x,par,t)
     λ = contact_rate(t,par.contact_par...)
     #vaccination rate
-    rate[1] = par.α x[1]
+    rate[1] = par.α  * x[1]
     #infection rate
     rate[2] = λ * (x[3] + x[4]) * x[1]
     rate[3] = p * λ * (x[3] + x[4]) * x[2]
     #death rate
-    rate[4] = par.γ_1 * x[3]
-    rate[5] = par.γ_2 * x[4]
+    rate[4] = par.σ * f_dead1 * x[3]
+    rate[5] = par.σ * f_dead2 * x[4]
     #recovery rate
-    rate[6] = par.δ_1 * x[3]
-    rate[7] = par.δ_2 * x[4]
+    rate[6] = par.σ * (1-f_dead1) * x[3]
+    rate[7] = par.σ * (1-f_dead2) * x[4]
     #immunity rate
     rate[8] = par.ϕ * x[6]
     #inimmunity rate
@@ -78,4 +81,7 @@ function rates!(rates,x,par,t)
 end
 
 
+    # γ_2 = σ * f_dead2,
+    # δ_1 = σ * (1-f_dead1),
+    # δ_2 = σ * (1-f_dead2),
 end #end module NewTrial
