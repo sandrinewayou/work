@@ -20,7 +20,7 @@ recovery!(x,j)  =  plus_minus_one(x,6, j)
 #recovery!(x,3)  =  plus_minus_one(x,6, 3)
 #recovery!(x,4)  =  plus_minus_one(x,6, 4)
 immunity!(x)    =  plus_minus_one(x,2, 6)
-inimmunity!(x)  =  plus_minus_one(x,1, 2)
+inimunity!(x)  =  plus_minus_one(x,1, 2)
 
 #execution function
 function execute!(i,x,par)
@@ -41,7 +41,7 @@ function execute!(i,x,par)
     elseif i == 8
         immunity!(x)
     elseif i == 9
-        innimunity!(x)
+        inimunity!(x)
     else
         error("unknown event number i = $i")
     end
@@ -56,27 +56,27 @@ end
 #contact rate
 function contact_rate(t,t_end,a,r_0,infect_period,ind)
     r0_t = basic_reproduction(t,t_end,a,r_0)
-    return sum( br/(i*j) for i in infect_period for j in ind)
+    return sum(r0_t/(i*j) for i in infect_period for j in ind)
 end
 
 #rate function
 function rates!(rates,x,par,t)
     λ = contact_rate(t,par.contact_par...)
     #vaccination rate
-    rate[1] = par.α  * x[1]
+    rates[1] = par.α  * x[1]
     #infection rate
-    rate[2] = λ * (x[3] + x[4]) * x[1]
-    rate[3] = p * λ * (x[3] + x[4]) * x[2]
+    rates[2] = λ * (x[3] + x[4]) * x[1]
+    rates[3] = par.p * λ * (x[3] + x[4]) * x[2]
     #death rate
-    rate[4] = par.σ * f_dead1 * x[3]
-    rate[5] = par.σ * f_dead2 * x[4]
+    rates[4] = par.σ * par.f_dead1 * x[3]
+    rates[5] = par.σ * par.f_dead2 * x[4]
     #recovery rate
-    rate[6] = par.σ * (1-f_dead1) * x[3]
-    rate[7] = par.σ * (1-f_dead2) * x[4]
+    rates[6] = par.σ * (1-par.f_dead1) * x[3]
+    rates[7] = par.σ * (1-par.f_dead2) * x[4]
     #immunity rate
-    rate[8] = par.ϕ * x[6]
+    rates[8] = par.ϕ * x[6]
     #inimmunity rate
-    rate[9] = par.β * x[2]
+    rates[9] = par.β * x[2]
     nothing
 end
 

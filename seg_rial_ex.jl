@@ -6,9 +6,9 @@ import .NewTrial
 
 using Plots
 
-f_dead1 = 0.03
-f_dead2 = 0.02
-p       = 0.5
+# f_dead1 = 0.03
+# f_dead2 = 0.02
+# p       = 0.5
 
 
 #contact parameter
@@ -27,6 +27,9 @@ par = (
         # δ_2 = σ * (1-f_dead2),
     ϕ   = 1/200,
     β   = 1/500,
+    f_dead1 = 0.03,
+    f_dead2 = 0.02,
+    p       = 0.5,
     contact_par = [t_end,a,r_0,infect_period,ind]
     )
 
@@ -37,7 +40,7 @@ par = (
 
 #initial condition
 x0 = [sum(ind),0,1,0,0,0]
-t = 0:1500
+t = 0:200
 
 
 num_events = 9
