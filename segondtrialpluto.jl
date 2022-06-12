@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.3
+# v0.17.1
 
 using Markdown
 using InteractiveUtils
@@ -28,11 +28,11 @@ md"""
 
 # ╔═╡ e4edc158-42b3-4bf1-8420-14b2bd19cd05
 #Local Path to MainFunctions.jl"
-main_functions_path = "C:/Users/dell/github/work/MainFunctions.jl";
+main_functions_path = "/home/larocca/github/work/MainFunctions.jl";
 
 # ╔═╡ 774add99-f8b9-4ae5-8a08-cc6cc71f64a7
 #Local Path to Modelname.jl"
-model_path = "C:/Users/dell/github/work/SandrineSIR.jl";
+model_path = "/home/larocca/github/work/SandrineSIR.jl";
 
 # ╔═╡ 59e73279-85bf-4c77-a207-cfd1106c1451
 md"""---
@@ -45,7 +45,7 @@ Population Size $(@bind s0 Slider(1000:1000:100_000,show_value=true,default=10_0
 """
 
 # ╔═╡ 2684693e-e731-40e0-a22d-35c62110009c
-initial_population = [s0-1,0,0,1,0];
+initial_population = [s0-1,0,1,0,0,0];
 
 # ╔═╡ 3b6e0504-40a1-409e-a4ef-b39be2bef971
 md"""---
@@ -57,33 +57,39 @@ md""" Basic infection rate: $\quad r_0$ $(@bind r_0  Slider(0.001:0.001:5.0,show
 """
 
 # ╔═╡ 5fa15756-0c38-4f9f-b36d-2f8d3a5f9e6a
-md"""Strength of Seasonal Effect $\quad a$ $(@bind a  Slider(0.001:0.001:1.0,show_value=true,default=0.1)) 
+md"""Strength of Seasonal Effect $\quad a$ $(@bind a  Slider(0.001:0.001:1.0,show_value=true,default=0.1))
 """
 
 # ╔═╡ 9d5c0f86-1e41-47f4-9dea-503d3bfbd3d5
-md"""Rate of vaccination $\quad \alpha$ $(@bind al  Slider(0.001:0.001:1.0,show_value=true,default=0.067)) 
+md"""Rate of vaccination $\quad \alpha$ $(@bind al  Slider(0.001:0.001:1.0,show_value=true,default=0.087))
 """
 
 # ╔═╡ 397ac091-4c45-4fa1-9b9b-24a966661a13
-md"""Rate of vaccination $\quad \beta$ $(@bind b  Slider(0.001:0.001:1.0,show_value=true,default=0.02)) 
+md"""Rate of suscepbility $\quad \phi$ $(@bind b  Slider(0.001:0.001:1.0,show_value=true,default=0.005))
 """
 
 # ╔═╡ 75002645-eeb0-43dd-bf53-25cc9a6b089d
-md"""Rate of recovery $\quad \gamma$ $(@bind g  Slider(0.001:0.001:1.0,show_value=true,default=0.05)) 
+md"""Rate of recovery or dead $\quad \delta$ $(@bind g  Slider(0.001:0.001:1.0,show_value=true,default=0.2))
+
+Rate of pi infectin $\quad p$ $(@bind Pi  Slider(0.001:0.001:1.0,show_value=true,default=0.5))
+
+Rate of  dead1 $\quad f_dead1$ $(@bind f1  Slider(0.001:0.001:1.0,show_value=true,default=0.03))
+
+Rate of dead 2 $\quad f_dead2$ $(@bind f2  Slider(0.001:0.001:1.0,show_value=true,default=0.02))
 """
 
 # ╔═╡ 193be177-08a1-42ed-98df-8d58031cd0ae
-md"""Rate of loss of immunity $\quad \delta$ $(@bind d  Slider(0.001:0.001:1.0,show_value=true,default=0.0037)) 
+md"""Rate of loss of immunity $\quad \beta$ $(@bind d  Slider(0.001:0.001:1.0,show_value=true,default=0.002))
 """
 
 # ╔═╡ 5ba2c008-5020-4fcd-82be-ec8089bcc6fe
-md"""Proportion of young to individuals $\quad$ $(@bind pr  Slider(0.0:0.001:1.0,show_value=true,default=0.6666)) 
+md"""Proportion of young to individuals $\quad$ $(@bind pr  Slider(0.0:0.001:1.0,show_value=true,default=0.6666))
 """
 
 # ╔═╡ a63a83f1-b37b-4918-804b-28d4bf04ae5a
-md""" Infection Period young Individuals $(@bind ipy Slider(0:1:100,show_value=true,default=5)) days
+md""" Infection Period young Individuals $(@bind ipy Slider(0:1:14,show_value=true,default=5)) days
 
-Infection Period old Individuals $(@bind ipo Slider(0:1:100,show_value=true,default=10)) days
+Infection Period old Individuals $(@bind ipo Slider(0:1:14,show_value=true,default=10)) days
 """
 
 # ╔═╡ 585df063-eebf-4367-a176-930d819b8c17
@@ -100,28 +106,39 @@ md"""---
 # ╔═╡ 76c1915b-c6af-4e6d-94e8-59dc4608f8a9
 begin
 	#number of different types (knots)
-	num_types = 5
+	num_types = 6
 	# 1 S | 2 V | 3 PI | 4 I | 5 R
-	types = ["S" "V" "PI" "I" "R"]
+	types = ["S" "pi" "I" "Iv" "D" "R"]
 
 	#number of different events (arrows)
-	num_events = 6
+	num_events = 9
 end;
 
 # ╔═╡ a80a9b8c-c738-4f88-aefb-29fcdde1ecf5
 begin #Setup Parameter
 	infect_period = [ipy,ipo]
 	ind = [ceil(Integer,s0*pr),floor(Integer,s0*(1-pr))]
-	
+
 	par = (
-	    α = al,
-	    β = b,
-	    γ = g,
-	    δ = d,
+		α       = al,
+		σ       = g,
+   		ϕ       = b,
+   		β       = d,
+   		f_dead1 = f1,
+   		f_dead2 = f2,
+   		p       = Pi,
 	    contact_par = [t_end,a,r_0,infect_period,ind]
 	    #contact = contact
 	)
 end;
+
+
+
+
+
+
+
+
 
 # ╔═╡ 1ac6bfb7-a740-4508-9615-065ba809bb0e
 md"""---
@@ -147,14 +164,14 @@ end
 Gillespie = ingredients(main_functions_path).Gillespie
 
 # ╔═╡ 69e4276c-b804-44f4-bc5e-7298db351242
-SIR = ingredients(model_path).SandrineSIR
+SIR = ingredients(model_path).NewTrial
 
 # ╔═╡ eb32b9a4-dfd2-4a24-8a75-e10bf9eceda4
 begin
 	#Execute Simulation
 	x0 = copy(initial_population)
 	hist = zeros(Int,(t_end+1,num_types))
-	
+
 	Gillespie.run_gillespie!(
 	        0:t_end,x0,par,
 	        SIR.execute!,SIR.rates!,
