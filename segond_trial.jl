@@ -10,7 +10,7 @@ end
 
     #events
  vaccination!(x) =  plus_minus_one(x,2, 1)
- infection!(x,j) =  plus_minus_one(x,3, j)
+ infection!(x,s,j) =  plus_minus_one(x,3, j)
  #infection!(x,1) =  plus_minus_one(x,3, 1)
  #infection!(x,2) =  plus_minus_one(x,4, 2)
  death!(x,j)     =  plus_minus_one(x,5, j)
@@ -27,9 +27,9 @@ function execute!(i,x,par)
     if i == 1
         vaccination!(x)
     elseif i == 2
-        infection!(x,1)
+        infection!(x,3,1)
     elseif i == 3
-        infection!(x,2)
+        infection!(x,4,2)
     elseif i == 4
         death!(x,3)
     elseif i == 5
