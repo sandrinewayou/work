@@ -13,8 +13,6 @@ module modified
 
  #events
 
-grow!(x) = plus_minus_one(x,2,6)
-
 #  (m,j)_a = (2,1), (m,j)_b = (6,7)
 vaccination!(x,m,j) =  plus_minus_one(x,m,j)
 
@@ -38,43 +36,45 @@ lost_imunity!(x,m,j) = plus_minus_one(x,m,j)
 
 function execute!(i,x,par)
     if i == 1
-        vaccination!(x,2,1)
+        vaccination!(x,4,1)
     elseif i == 2
-        vaccination!(x,6,7)
+        vaccination!(x,7,10)
      elseif i == 3
-         infection!(x,1,3)
+         infection!(x,1,2)
     elseif i == 4
-        infection!(x,2,4)
+        infection!(x,4,5)
     elseif i == 5
-        infection!(x,6,8)
+        infection!(x,7,8)
     elseif i == 6
-        infection!(x,7,9)
+        infection!(x,10,11)
     elseif i == 7
-        recovery!(x,3,5)
+        recovery!(x,2,3)
     elseif i == 8
-        recovery!(x,4,5)
+        recovery!(x,5,6)
     elseif i == 9
-        recovery!(x,8,10)
+        recovery!(x,8,9)
     elseif i == 10
-        recovery!(x,9,10)
+        recovery!(x,11,12)
     elseif i == 11
-        dead!(x,3,11)
+        dead!(x,2,13)
     elseif i == 12
-        dead!(x,4,11)
+        dead!(x,5,13)
     elseif i == 13
-        dead!(x,8,11)
+        dead!(x,8,13)
     elseif i == 14
-        dead!(x,9,11)
+        dead!(x,11,13)
     elseif i == 15
-        suscepbility!(x,5,1)
+        suscepbility!(x,3,1)
     elseif i == 16
-        suscepbility!(x,10,7)
+        suscepbility!(x,6,4)
     elseif i == 17
-        lost_imunity!(x,1,2)
+        suscepbility!(x,9,7)
     elseif i == 18
-        lost_imunity!(x,7,6)
+        suscepbility!(x,12,10)
     elseif i == 19
-        grow!(x)
+        lost_imunity!(x,1,4)
+    elseif i == 20
+        lost_imunity!(x,7,10)
     else
         error("unknown event number i = $i")
     end
@@ -92,48 +92,65 @@ function contact_rate(t,t_end,a,r_0,infect_period,ind)
     return sum(r0_t/(i*j) for i in infect_period for j in ind)
 end
 
+#general contact reduction for population b
+
+function contact_reduction!(x,p_d1,p_d2,p_d3)
+	p_gen=0
+    if x[1]+x[2] == 1/4 * (x[3]+x[4])
+        return p_gen += p_d1
+    elseif x[1]+x[2] == 1/3 * (x[3]+x[4])
+        return p_gen += p_d2
+    elseif x[1]+x[2] == 1/2 * (x[3]+x[4])
+        return p_gen += p_d3
+    else
+       return p_gen = 0
+    end
+
+
+end
 # events rates
 
 function rates!(rates,x,par,t)
     λ = contact_rate(t,par.contact_par...)
     #vaccination rate
-    rates[1] = par.α_1 * x[2]
-    rates[2] = par.α_2 * x[6]
+    rates[1] = par.α_1 * x[4]
+    rates[2] = par.α_2 * x[7]
 
     #infection rate
-    rates[3] = par.p * λ * ( x[4] + x[8] + par.η * (x[3] + x[9]) ) * x[1]
-    rates[4] = λ * ( x[4] + x[8] + par.η * (x[3] + x[9]) ) * x[2]
-    rates[5] = λ * ( x[4] + x[8] + par.η * (x[3] + x[9]) ) * x[6]
-    rates[6] = par.p * λ * ( x[4] + x[8] + par.η * (x[3] + x[9]) ) * x[7]
+    rates[3] = par.p * λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[1]
+    rates[4] = λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[4]
+    rates[5] = λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[7]
+    rates[6] = par.p *(1-contact_reduction!(x,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[10]
 
     #recovery rate
-    rates[7] = par.σ_1 * (1-par.f_dead2) * x[3]
-    rates[8] = par.σ_1 * (1-par.f_dead1) * x[4]
+    rates[7] = par.σ_1 * (1-par.f_dead2) * x[2]
+    rates[8] = par.σ_1 * (1-par.f_dead1) * x[5]
 
     rates[9]  = par.σ_2 * (1-par.f_dead1) * x[8]
-    rates[10] = par.σ_2 * (1-par.f_dead2) * x[9]
+    rates[10] = par.σ_2 * (1-par.f_dead2) * x[11]
 
     #death rate young
-    rates[11] = par.σ_1 * par.f_dead2 * x[3]
-    rates[12] = par.σ_1 * par.f_dead1 * x[4]
+    rates[11] = par.σ_1 * par.f_dead2 * x[2]
+    rates[12] = par.σ_1 * par.f_dead1 * x[5]
     #death rate old
     rates[13] = par.σ_2 * par.f_dead1 * x[8]
-    rates[14] = par.σ_2 * par.f_dead2 * x[9]
+    rates[14] = par.σ_2 * par.f_dead2 * x[11]
 
     #suscepbility rate
-    rates[15] = par.ϕ * x[5]
-    rates[16] = par.ϕ * x[10]
+    rates[15] = par.β * x[3]
+    rates[16] = par.β * x[6]
+	rates[17] = par.β * x[9]
+    rates[18] = par.β * x[12]
 
     #lost immunity rate
-    rates[17] = par.β * x[1]
-    rates[18] = par.β * x[7]
-
-    #grow rate
-    rates[19] = par.μ * x[2]
+    rates[19] = par.μ * x[1]
+    rates[20] = par.μ * x[10]
 
     nothing
 end
 
+
+# separation graph
 
 
 

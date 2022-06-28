@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.3
+# v0.14.9
 
 using Markdown
 using InteractiveUtils
@@ -7,9 +7,8 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     quote
-        local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
-        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
+        global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : missing
         el
     end
 end
@@ -28,11 +27,11 @@ md"""
 
 # ╔═╡ e4edc158-42b3-4bf1-8420-14b2bd19cd05
 #Local Path to MainFunctions.jl"
-main_functions_path = "C:/Users/dell/github/work/MainFunctions.jl";
+main_functions_path = "/home/sandfossouo/github/work/MainFunctions.jl";
 
 # ╔═╡ 774add99-f8b9-4ae5-8a08-cc6cc71f64a7
 #Local Path to Modelname.jl"
-model_path = "C:/Users/dell/github/work/segond_trial.jl";
+model_path = "/home/sandfossouo/github/work/segond_trial.jl";
 
 # ╔═╡ 59e73279-85bf-4c77-a207-cfd1106c1451
 md"""---
@@ -96,6 +95,15 @@ Infection Period old Individuals $(@bind ipo Slider(0:1:14,show_value=true,defau
 md"""---
 **Execute and Plot**
 """
+
+# ╔═╡ 63b6181d-8985-46be-89cb-11f5797615a8
+function A(hist)
+	T= zeros(Int8, 1, length(hist))
+		for i in 0:length(hist)
+		T[i] += hist[i]
+	end
+	return T
+end
 
 # ╔═╡ beee6289-5971-452b-9561-a40868f0874a
 md"""---
@@ -181,6 +189,31 @@ begin
 	plot(hist,label=types)
 end
 
+# ╔═╡ b57d35fd-3b22-4fc7-a4b9-d5a29405050f
+hist[200][2]
+
+# ╔═╡ f67a4538-3bdd-47a7-b594-7dd1ad880330
+A(hist)
+
+# ╔═╡ adfa82b3-cfc4-44ae-9c35-bb9621d5322b
+function contact_reduction(x,p_d1,p_d2,p_d3)
+	p_gen=0
+    if x[1]+x[2] == 1/4 * (x[3]+x[4])
+        return p_gen += p_d1
+    elseif x[1]+x[2] == 1/3 * (x[3]+x[4])
+        return p_gen += p_d2
+    elseif x[1]+x[2] == 1/2 * (x[3]+x[4])
+        return p_gen += p_d3
+    else
+       return p_gen = 0
+    end
+   
+	
+end
+
+# ╔═╡ ed555ef3-d956-4379-b8d0-c59c5ed9b218
+contact_reduction([3,4,9,5],0.2, 0.4,0.6)
+
 # ╔═╡ Cell order:
 # ╟─c5576946-69fd-4ac9-986f-0afb74b70137
 # ╠═e4edc158-42b3-4bf1-8420-14b2bd19cd05
@@ -199,7 +232,10 @@ end
 # ╟─a63a83f1-b37b-4918-804b-28d4bf04ae5a
 # ╟─585df063-eebf-4367-a176-930d819b8c17
 # ╠═eb32b9a4-dfd2-4a24-8a75-e10bf9eceda4
-# ╟─beee6289-5971-452b-9561-a40868f0874a
+# ╠═b57d35fd-3b22-4fc7-a4b9-d5a29405050f
+# ╠═63b6181d-8985-46be-89cb-11f5797615a8
+# ╠═f67a4538-3bdd-47a7-b594-7dd1ad880330
+# ╠═beee6289-5971-452b-9561-a40868f0874a
 # ╠═76c1915b-c6af-4e6d-94e8-59dc4608f8a9
 # ╠═a80a9b8c-c738-4f88-aefb-29fcdde1ecf5
 # ╟─1ac6bfb7-a740-4508-9615-065ba809bb0e
@@ -207,3 +243,5 @@ end
 # ╟─51a474ce-7a49-405a-8aeb-632f819557ce
 # ╟─69e4276c-b804-44f4-bc5e-7298db351242
 # ╠═42e093ec-dbda-4474-bc31-8ad3bdfda9e7
+# ╠═adfa82b3-cfc4-44ae-9c35-bb9621d5322b
+# ╠═ed555ef3-d956-4379-b8d0-c59c5ed9b218
