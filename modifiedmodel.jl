@@ -105,22 +105,54 @@ function contact_reduction!(x,p_d1,p_d2,p_d3)
     else
        return p_gen = 0
     end
-
-
 end
+	#external force of infection
+
+	function ext_force(n,λ_n)
+		return (ℯ^(-λ_n)*λ_n^n)/factorial(n)
+	end
+
+
+# vaccination rate
+function vaccination_rate_a(t,par)
+	y = 0
+	if par.t_start ≤ t < par.t_1
+		return  y += par.α_1
+	elseif t ≥ par.t_1
+		return y += par.α_2
+	else
+		return y = 0
+	end
+end
+
+
+function vaccination_rate_b(t,par)
+	o = 0
+	if par.t_start ≤ t < par.t_1
+		return  o += par.α_2
+	elseif  t ≥ par.t_1
+		return o += par.α_3
+	else
+		return o = 0
+	end
+end
+
 # events rates
 
 function rates!(rates,x,par,t)
     λ = contact_rate(t,par.contact_par...)
+	p_n = ext_force(par.ext...)
+	α_a = vaccination_rate_a(t,par)
+	α_b = vaccination_rate_b(t,par)
     #vaccination rate
-    rates[1] = par.α_1 * x[4]
-    rates[2] = par.α_2 * x[7]
+    rates[1] = α_a * x[4]
+    rates[2] = α_b * x[7]
 
     #infection rate
-    rates[3] = par.p * λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[1]
-    rates[4] = λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[4]
-    rates[5] = λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[7]
-    rates[6] = par.p *(1-contact_reduction!(x,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11]) ) * x[10]
+    rates[3] = par.p * (1-contact_reduction!(x,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n ) * x[1]
+    rates[4] = λ * (1-contact_reduction!(x,par.gen_par...)) * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n  ) * x[4]
+    rates[5] = λ * (1-contact_reduction!(x,par.gen_par...)) * ( x[5] + x[8] + par.η * (x[2] + x[11]) +p_n ) * x[7]
+    rates[6] = par.p * (1-contact_reduction!(x,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n  ) * x[10]
 
     #recovery rate
     rates[7] = par.σ_1 * (1-par.f_dead2) * x[2]
