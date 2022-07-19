@@ -87,23 +87,21 @@ function basic_reproduction(t,t_end,a,r_0)
 end
 
 #contact rate
-function contact_rate(t,t_end,a,r_0,infect_period,ind)
+function contact_rate!(x,t,t_end,a,r_0,infect_period)
+	ind = [x[1]+x[4],x[7]+x[10]]
     r0_t = basic_reproduction(t,t_end,a,r_0)
     return sum(r0_t/(i*j) for i in infect_period for j in ind)
 end
 
 #general contact reduction for population b
 
-function contact_reduction!(x,p_d1,p_d2,p_d3)
-	p_gen=0
-    if x[1]+x[2] == 1/4 * (x[3]+x[4])
-        return p_gen += p_d1
-    elseif x[1]+x[2] == 1/3 * (x[3]+x[4])
-        return p_gen += p_d2
-    elseif x[1]+x[2] == 1/2 * (x[3]+x[4])
-        return p_gen += p_d3
+function contact_reduction(p_d2,p_d3,t,t_c1, t_c2)
+    if t< t_c1
+        return  p_d3
+    elseif t_c1 ≤ t ≤ t_c2
+        return  p_d2
     else
-       return p_gen = 0
+       return  0
     end
 end
 	#external force of infection
@@ -115,44 +113,43 @@ end
 
 # vaccination rate
 function vaccination_rate_a(t,par)
-	y = 0
 	if par.t_start ≤ t < par.t_1
-		return  y += par.α_1
+		return  par.α_1
 	elseif t ≥ par.t_1
-		return y += par.α_2
+		return par.α_2
 	else
-		return y = 0
+		return 0
 	end
 end
 
 
 function vaccination_rate_b(t,par)
-	o = 0
 	if par.t_start ≤ t < par.t_1
-		return  o += par.α_2
+		return par.α_2
 	elseif  t ≥ par.t_1
-		return o += par.α_3
+		return par.α_3
 	else
-		return o = 0
+		return 0
 	end
 end
 
 # events rates
 
 function rates!(rates,x,par,t)
-    λ = contact_rate(t,par.contact_par...)
+    λ = contact_rate!(x,t,par.contact_par...)
 	p_n = ext_force(par.ext...)
 	α_a = vaccination_rate_a(t,par)
 	α_b = vaccination_rate_b(t,par)
+	k = (1-contact_reduction(t,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n )
     #vaccination rate
-    rates[1] = α_a * x[4]
-    rates[2] = α_b * x[7]
+    rates[1] = par.α_1 * x[4]
+    rates[2] = par.α_2 * x[7]
 
     #infection rate
-    rates[3] = par.p * (1-contact_reduction!(x,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n ) * x[1]
-    rates[4] = λ * (1-contact_reduction!(x,par.gen_par...)) * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n  ) * x[4]
-    rates[5] = λ * (1-contact_reduction!(x,par.gen_par...)) * ( x[5] + x[8] + par.η * (x[2] + x[11]) +p_n ) * x[7]
-    rates[6] = par.p * (1-contact_reduction!(x,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n  ) * x[10]
+    rates[3] = par.p * (1-contact_reduction(t,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n ) * (x[1])
+    rates[4] = λ * (1-contact_reduction(t,par.gen_par...)) * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n  ) * (x[4])
+    rates[5] = λ * (1-contact_reduction(t,par.gen_par...)) * ( x[5] + x[8] + par.η * (x[2] + x[11]) +p_n ) * (x[7])
+    rates[6] = par.p * (1-contact_reduction(t,par.gen_par...)) * λ * ( x[5] + x[8] + par.η * (x[2] + x[11])+p_n  ) * (x[10])
 
     #recovery rate
     rates[7] = par.σ_1 * (1-par.f_dead2) * x[2]
